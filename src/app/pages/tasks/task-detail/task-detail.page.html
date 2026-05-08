@@ -59,7 +59,7 @@
 
       <!--El botón de guardar los cambios o crear la tarea (dependiendo del estado)-->
       <footer class="form-actions">
-        <ion-button type="submit" expand="block" shape="round" color="primary" class="submit-btn" [disabled]="taskForm.invalid">
+        <ion-button type="submit" expand="block" shape="round" class="submit-btn" [disabled]="taskForm.invalid">
           <ion-icon slot="start" name="save-outline"></ion-icon>
           {{ isEditMode() ? 'Guardar Cambios' : 'Crear Tarea' }}
         </ion-button>

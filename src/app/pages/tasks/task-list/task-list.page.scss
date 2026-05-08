@@ -1,10 +1,9 @@
 ion-content {
-  --background: #f4f5f8;
+  --background: #fdf8ee;
 }
 
-/* LA MAGIA: El contenedor padre empuja todo hacia adentro */
 .list-container {
-  padding: 1rem; /* 1rem de espacio garantizado por los 4 lados de la pantalla */
+  padding: 1rem;
 }
 
 ion-list {
@@ -15,14 +14,13 @@ ion-list {
 
 /* 1. EL CONTENEDOR DESLIZABLE ES LA CAJA MAESTRA */
 .custom-sliding {
-  margin: 0 0 0.8rem 0; /* ¡SOLO margen abajo! El lateral ya lo da el padre */
+  margin: 0 0 0.8rem 0;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   background: #ffffff; /* Fondo blanco para el submenú */
   overflow: hidden;
 }
 
-/* 2. EL ITEM AHORA ES UN CONTENEDOR INVISIBLE PARA IONIC */
 ion-item.task-card-item {
   --background: #ffffff;
   --padding-start: 0;     
@@ -94,8 +92,8 @@ ion-item.task-card-item {
 
 /* ESTILOS DEL BOTÓN FAB */
 .custom-fab {
-  --background: #eed9b8; 
-  --background-hover: #f5dfba;
+  --background: #efc581; 
+  --background-hover: #efc581;
   --color: #333333; 
   width: 46px;  
   height: 46px;
@@ -110,10 +108,9 @@ ion-item.task-card-item {
   align-items: flex-start;
   padding: 0.2rem 1rem 0.5rem 1rem;
   gap: 0.5rem; 
-  margin: 0; /* Por si <section> añade márgenes por defecto en algún navegador */
+  margin: 0;
 }
 
-/* Columna individual (ahora es un <label>) */
 .filter-col {
   flex: 1; 
   display: flex;

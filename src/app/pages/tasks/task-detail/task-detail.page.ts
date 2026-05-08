@@ -23,8 +23,6 @@ export class TaskDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private taskService = inject(TaskService);
-
-  public taskForm: FormGroup;
   
   // Señal para saber si la vista está en modo edición o creación
   public isEditMode = signal<boolean>(false);
@@ -34,17 +32,17 @@ export class TaskDetailPage implements OnInit {
   // guardamos el estado original de la tarea para no perderlo al editar
   private isTaskCompleted: boolean = false;
 
+  // inicializamos el formulario con sus validaciones
+  public taskForm = this.fb.nonNullable.group({
+    title: ['', [Validators.required, Validators.minLength(3)]],
+    description: [''],
+    deadline: ['', Validators.required],
+    priority: ['media' as TaskPriority, Validators.required]
+  });
+
   constructor() {
     addIcons({ 
       saveOutline 
-    });
-
-    // inicializamos el formulario con sus validaciones
-    this.taskForm = this.fb.group({
-      title: ['', [Validators.required, Validators.minLength(3)]],
-      description: [''],
-      deadline: ['', Validators.required],
-      priority: ['media', Validators.required]
     });
   }
 
@@ -82,16 +80,16 @@ export class TaskDetailPage implements OnInit {
 
   public saveTask(): void {
     if (this.taskForm.valid) {
-      const formValues = this.taskForm.value;
+      // getRawValue() extrae los valores con sus tipos exactos sin posibilidad de nulos
+      const formValues = this.taskForm.getRawValue();
       
       const taskData: Task = {
-        // si estamos creando, generamos un ID único con la fecha actual
-        // Si editamos, usamos el que ya tenía
+        // Si editamos, usamos el id que ya tenía
         id: this.isEditMode() && this.currentTaskId ? this.currentTaskId : Date.now(),
         title: formValues.title,
         description: formValues.description,
         deadline: formValues.deadline,
-        priority: formValues.priority as TaskPriority,
+        priority: formValues.priority,
         completed: this.isTaskCompleted 
       };
 
@@ -103,6 +101,7 @@ export class TaskDetailPage implements OnInit {
 
       // Volvemos al listado
       this.router.navigate(['/task-list']);
+    
     } else {
       // Si el formulario es inválido, forzamos a que se muestren los errores
       this.taskForm.markAllAsTouched();

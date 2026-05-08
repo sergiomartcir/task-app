@@ -45,7 +45,7 @@
   <main class="list-container">
     <section class="tasks-section">
       <ion-list lines="none">
-        
+        <!--cada una de las tasks que hayan en el array-->
         @for (task of filteredTasks(); track task.id) {
           <ion-item-sliding #slidingItem class="custom-sliding">
             <ion-item class="task-card-item" lines="none" (click)="navigateToTaskDetail(task.id)">
@@ -76,7 +76,7 @@
 
             </ion-item-options>
           </ion-item-sliding>
-
+        <!--Si no hay ninguna sale este mensaje-->
         } @empty {
           <section class="empty-state">
             <p>No tienes tareas</p>
@@ -87,6 +87,7 @@
     </section>
   </main>
 
+  <!--botón de crear una nueva tarea (formulario)-->
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="navigateToCreateTask()" class="custom-fab">
       <ion-icon name="add-outline"></ion-icon>

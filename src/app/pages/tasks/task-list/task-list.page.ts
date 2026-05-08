@@ -32,35 +32,30 @@ export class TaskListPage {
   public priorityFilter = signal<PriorityFilter>('ninguno');
   public dateSort = signal<DateSort>('ninguno');
 
-  //señal computada que evalúa y cruza los tres fltros
+  //señal computada que evalúa los tres filtros
   public filteredTasks = computed(() => {
     const tasks = this.allTasks();
     const status = this.statusFilter();
     const priority = this.priorityFilter();
     const sort = this.dateSort();
 
-    // Hacemos una copia del array para no mutar el original
-    let processedTasks = [...tasks];
+    // Filtrado en una sola pasada
+    let processedTasks = tasks.filter(task => {
+      const matchStatus = status === 'todas' 
+        || (status === 'pendientes' && !task.completed) 
+        || (status === 'completadas' && task.completed);
+        
+      const matchPriority = priority === 'ninguno' || task.priority === priority;
 
-    // 1. Filtrar por Estado
-    if (status === 'pendientes') {
-      processedTasks = processedTasks.filter(task => !task.completed);
-    } else if (status === 'completadas') {
-      processedTasks = processedTasks.filter(task => task.completed);
-    }
+      return matchStatus && matchPriority;
+    });
 
-    // 2. Filtrar por Prioridad
-    if (priority !== 'ninguno') {
-      processedTasks = processedTasks.filter(task => task.priority === priority);
-    }
-
-    // 3. Ordenar por Fecha
+    // Ordenación
     if (sort !== 'ninguno') {
       processedTasks.sort((a, b) => {
         const timeA = new Date(a.deadline).getTime();
         const timeB = new Date(b.deadline).getTime();
         
-        // desc (mayor a menor) | asc (menor a mayor)
         return sort === 'desc' ? timeB - timeA : timeA - timeB;
       });
     }
@@ -77,18 +72,20 @@ export class TaskListPage {
     });
   }
 
-  // métodos para actualizar pr el filtro
-  public changeStatusFilter(event: any): void {
-    this.statusFilter.set(event.detail.value);
+  // --- MÉTODOS DE FILTRADO---
+  public changeStatusFilter(event: CustomEvent): void {
+    this.statusFilter.set(event.detail.value as StatusFilter);
   }
 
-  public changePriorityFilter(event: any): void {
-    this.priorityFilter.set(event.detail.value);
+  public changePriorityFilter(event: CustomEvent): void {
+    this.priorityFilter.set(event.detail.value as PriorityFilter);
   }
 
-  public changeDateSort(event: any): void {
-    this.dateSort.set(event.detail.value);
+  public changeDateSort(event: CustomEvent): void {
+    this.dateSort.set(event.detail.value as DateSort);
   }
+
+  // --- MÉTODOS DE NAVEGACIÓN Y ACCIONES ---
 
   // método para navegar al form de añadir nueva tarea
   public navigateToCreateTask(): void {

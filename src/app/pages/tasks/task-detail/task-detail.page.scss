@@ -1,5 +1,5 @@
 ion-content {
-  --background: #f4f5f8;
+  --background: #fdf8ee;
 }
 
 .form-container {
@@ -60,8 +60,15 @@ ion-content {
 
 .form-actions {
   margin-top: 2.5rem;
+  
   .submit-btn {
-    --box-shadow: 0 6px 15px rgba(var(--ion-color-primary-rgb), 0.3);
+    /* Mismos colores que el botón FAB del Splash/Listado */
+    --background: #d2a050; 
+    --background-hover: #d2a050;
+    --color: #333333; /* Texto oscuro para que contraste y se lea bien */
+    
+    /* Sombra neutra ajustada al nuevo color */
+    --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08); 
     font-weight: 600;
     height: 48px;
   }
