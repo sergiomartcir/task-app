@@ -1,0 +1,70 @@
+ion-content {
+  --background: #f4f5f8;
+}
+
+.form-container {
+  padding: 1.5rem 1.2rem;
+}
+
+.form-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; // Espacio entre cada campo
+}
+
+/* Títulos externos (Los que estaban dando problemas) */
+.field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.6rem; // Espacio exacto sobre el recuadro
+  padding-left: 0.2rem;
+}
+
+/* El recuadro blanco de fondo */
+.input-box {
+  --background: #ffffff;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --inner-padding-end: 0;
+  --min-height: 54px; // Altura uniforme para todos
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  
+  // Forzamos que el contenido empiece arriba y tenga la misma fuente
+  ion-input, ion-textarea, ion-select {
+    font-size: 1rem !important;
+    font-family: inherit !important; // Evita cambios de fuente en prioridad
+    color: var(--ion-color-dark);
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+  }
+}
+
+.field-wrapper.has-error .input-box {
+  border: 1px solid var(--ion-color-danger);
+}
+
+.error-msg {
+  color: var(--ion-color-danger);
+  font-size: 0.75rem;
+  margin-top: 0.4rem;
+  padding-left: 0.2rem;
+}
+
+.form-actions {
+  margin-top: 2.5rem;
+  .submit-btn {
+    --box-shadow: 0 6px 15px rgba(var(--ion-color-primary-rgb), 0.3);
+    font-weight: 600;
+    height: 48px;
+  }
+}
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }

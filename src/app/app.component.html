@@ -1,9 +1,13 @@
 <ion-app>
-  <app-header></app-header>
+  @if (showLayout()) {
+    <app-header></app-header>
+  }
   
   <ion-content>
     <ion-router-outlet></ion-router-outlet>
   </ion-content>
-
-  <app-footer></app-footer>
+  
+  @if (showLayout()) {
+    <app-footer></app-footer>
+  }
 </ion-app>

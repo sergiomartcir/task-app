@@ -1,0 +1,70 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/task-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      {{ isEditMode() ? 'Editar Tarea' : 'Nueva Tarea' }}
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <main class="form-container">
+    <form [formGroup]="taskForm" (ngSubmit)="saveTask()">
+      
+      <fieldset class="form-group">
+        <legend class="sr-only">Detalles de la tarea</legend>
+
+        <!--título obligatorio de la tarea-->
+        <article class="field-wrapper" [class.has-error]="isFieldInvalid('title')">
+          <span class="field-label">Título de la tarea</span>
+          <ion-item lines="none" class="input-box">
+            <ion-input formControlName="title" type="text"></ion-input>
+          </ion-item>
+          @if (isFieldInvalid('title')) {
+            <small class="error-msg">El título es obligatorio</small>
+          }
+        </article>
+
+        <!--apartado descripción (no es necesaria)-->
+        <article class="field-wrapper">
+          <span class="field-label">Descripción (opcional)</span>
+          <ion-item lines="none" class="input-box">
+            <ion-textarea formControlName="description" rows="4" placeholder="Añade detalles..."></ion-textarea>
+          </ion-item>
+        </article>
+
+        <!--Apartado fecha límite-->
+        <article class="field-wrapper" [class.has-error]="isFieldInvalid('deadline')">
+          <span class="field-label">Fecha límite</span>
+          <ion-item lines="none" class="input-box">
+            <ion-input formControlName="deadline" type="date"></ion-input>
+          </ion-item>
+        </article>
+
+        <article class="field-wrapper">
+          <span class="field-label">Prioridad</span>
+          <ion-item lines="none" class="input-box">
+            <ion-select formControlName="priority" interface="popover" placeholder="Selecciona">
+              <!--las tres opciones de proridad que hay-->
+              <ion-select-option value="alta">Alta</ion-select-option>
+              <ion-select-option value="media">Media</ion-select-option>
+              <ion-select-option value="baja">Baja</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </article>
+
+      </fieldset>
+
+      <!--El botón de guardar los cambios o crear la tarea (dependiendo del estado)-->
+      <footer class="form-actions">
+        <ion-button type="submit" expand="block" shape="round" color="primary" class="submit-btn" [disabled]="taskForm.invalid">
+          <ion-icon slot="start" name="save-outline"></ion-icon>
+          {{ isEditMode() ? 'Guardar Cambios' : 'Crear Tarea' }}
+        </ion-button>
+      </footer>
+
+    </form>
+  </main>
+</ion-content>

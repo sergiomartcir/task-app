@@ -1,0 +1,32 @@
+:host {
+  --splash-bg-color: #eed9b8;
+  --icon-color: #eed9b8;
+}
+
+ion-content {
+  --background: var(--splash-bg-color);
+}
+
+.splash-container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center; // Quitamos el flex-direction column y el gap que ya no hacen falta
+}
+
+.icon-circle {
+  margin: 0;
+  background-color: #ffffff;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  
+  ion-icon {
+    font-size: 70px;
+    color: var(--icon-color);
+  }
+}
