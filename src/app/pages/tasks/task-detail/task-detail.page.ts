@@ -3,19 +3,19 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { Camera } from '@capacitor/camera';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { TaskService } from 'src/app/services/task.service';
 import { Task, TaskCategory, TaskPriority } from 'src/app/interfaces/task.interface';
+import { TaskCameraComponent } from 'src/app/shared/components/task-camera/task-camera.component';
 import { addIcons } from 'ionicons';
-import { saveOutline, cameraOutline, trashOutline, qrCodeOutline, linkOutline } from 'ionicons/icons';
+import { saveOutline, qrCodeOutline, linkOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-task-detail',
   templateUrl: './task-detail.page.html',
   styleUrls: ['./task-detail.page.scss'],
   standalone: true,
-  imports: [ CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon]
+  imports: [CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon, TaskCameraComponent]
 })
 export class TaskDetailPage implements OnInit {
   private fb = inject(FormBuilder);
@@ -45,8 +45,6 @@ export class TaskDetailPage implements OnInit {
   constructor() {
     addIcons({ 
       saveOutline,
-      cameraOutline,
-      trashOutline,
       qrCodeOutline,
       linkOutline
     });
@@ -128,42 +126,9 @@ export class TaskDetailPage implements OnInit {
 
   // -- FUNCIONALIDAD DE CAMERA --
 
-  // transforma el webPath nativo a Base64 para poder guardarlo (por la nueva version de Camera)
-  private async getBase64FromWebPath(webPath: string): Promise<string> {
-    const response = await fetch(webPath);
-    const blob = await response.blob();
-
-    // Almacenamos la lógica en una constante esperando su resolución
-    const base64Result = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onerror = reject;
-      reader.onload = () => resolve(reader.result as string);
-      reader.readAsDataURL(blob);
-    });
-
-    return base64Result;
-  }
-
-  public async takePicture(): Promise<void> {
-    try {
-      // Abre directamente la cámara
-      const image = await Camera.takePhoto({
-        quality: 70
-      });
-
-      // Si la foto se ha tomado correctamente, obtenemos su ruta
-      if (image.webPath) {
-        // Usamos nuestra función auxiliar para convertirla y la guardamos en la señal
-        const base64String = await this.getBase64FromWebPath(image.webPath);
-        this.capturedImage.set(base64String);
-      }
-    } catch (error) {
-      console.error('El usuario canceló o hubo un error con la cámara', error);
-    }
-  }
-
-  public removePicture(): void {
-    this.capturedImage.set(undefined);
+  // actualiza la señal para recibir la imagen de task-camera
+  public updateCapturedImage(newImage: string | undefined): void {
+    this.capturedImage.set(newImage);
   }
 
   // --- MÉTODOS PARA EL ESCÁNER QR ---

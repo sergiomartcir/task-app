@@ -1,11 +1,12 @@
 import { Component, inject, signal, computed} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonList, IonItemSliding, IonItem, IonFab, IonFabButton, IonBadge, IonItemOptions, IonItemOption, AlertController, IonSelect, IonSelectOption, IonButtons, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonList, IonItemSliding, IonFab, IonFabButton, AlertController, IonButtons, IonButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { TaskService } from 'src/app/services/task.service';
+import { TaskCardComponent } from 'src/app/shared/components/task-card/task-card.component';
+import { TaskFiltersComponent } from 'src/app/shared/components/task-filters/task-filters.component';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkCircleOutline, closeCircleOutline, trashOutline, refreshOutline, filterOutline } from 'ionicons/icons';
+import { addOutline, filterOutline } from 'ionicons/icons';
 
 export type StatusFilter = 'todas' | 'pendientes' | 'completadas';
 export type PriorityFilter = 'ninguno' | 'alta' | 'media' | 'baja';
@@ -17,7 +18,7 @@ export type DateSort = 'ninguno' | 'asc' | 'desc';
   templateUrl: './task-list.page.html',
   styleUrls: ['./task-list.page.scss'],
   standalone: true,
-  imports: [ IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonIcon, IonList, IonItemSliding, IonItem, IonFab, IonFabButton, IonBadge, IonItemOptions, IonItemOption, IonSelect, IonSelectOption, IonButtons, IonButton]
+  imports: [ IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, IonIcon, IonList, IonFab, IonFabButton, IonButtons, IonButton, TaskCardComponent, TaskFiltersComponent]
 })
 export class TaskListPage {
 
@@ -35,7 +36,7 @@ export class TaskListPage {
   public dateSort = signal<DateSort>('ninguno');
   public showFilters = signal<boolean>(false);
 
-  //señal computada que evalúa los tres filtros
+  //señal computada que evalúa los filtros
   public filteredTasks = computed(() => {
     const tasks = this.allTasks();
     const status = this.statusFilter();
@@ -71,29 +72,26 @@ export class TaskListPage {
   constructor() { 
     addIcons({ 
       addOutline,
-      trashOutline,
-      checkmarkCircleOutline, 
-      closeCircleOutline,
-      refreshOutline,
       filterOutline
     });
   }
 
   // --- MÉTODOS DE FILTRADO---
-  public changeStatusFilter(event: CustomEvent): void {
-    this.statusFilter.set(event.detail.value as StatusFilter);
+
+  public changeStatusFilter(value: StatusFilter): void { 
+    this.statusFilter.set(value); 
   }
 
-  public changePriorityFilter(event: CustomEvent): void {
-    this.priorityFilter.set(event.detail.value as PriorityFilter);
+  public changePriorityFilter(value: PriorityFilter): void { 
+    this.priorityFilter.set(value); 
   }
 
-  public changeCategoryFilter(event: CustomEvent): void {
-    this.categoryFilter.set(event.detail.value as CategoryFilter);
+  public changeCategoryFilter(value: CategoryFilter): void { 
+    this.categoryFilter.set(value); 
   }
 
-  public changeDateSort(event: CustomEvent): void {
-    this.dateSort.set(event.detail.value as DateSort);
+  public changeDateSort(value: DateSort): void { 
+    this.dateSort.set(value); 
   }
 
   public clearFilters(): void {
@@ -108,7 +106,7 @@ export class TaskListPage {
     this.showFilters.update(v => !v);
   }
 
-  // --- MÉTODOS DE NAVEGACIÓN Y ACCIONES ---
+  // --- MÉTODOS DE NAVEGACIÓN ---
 
   // método para navegar al form de añadir nueva tarea
   public navigateToCreateTask(): void {
@@ -120,16 +118,18 @@ export class TaskListPage {
     this.router.navigate(['/task-detail', taskId]);
   }
 
-  public async toggleTaskCompletion(taskId: number, slidingItem: IonItemSliding): Promise<void> {
+  // --- MÉTODOS DE ACCIONES ---
+
+  public async toggleTaskCompletion(event: {id: number, slidingItem: IonItemSliding}): Promise<void> {
     // Esperamos a que la animación de cierre de Ionic termine por completo
-    await slidingItem.close();
+    await event.slidingItem.close();
     
     // Una vez cerrada, cambiamos el estado
-    this.taskService.toggleCompletion(taskId);
+    this.taskService.toggleCompletion(event.id);
   }
 
   // eliminar la tarea y confirmarlo con el AlertController
-  public async confirmDeleteTask(taskId: number, slidingItem: IonItemSliding): Promise<void> {
+  public async confirmDeleteTask(event: {id: number, slidingItem: IonItemSliding}): Promise<void> {
     const alert = await this.alertController.create({
       header: '¿Estás seguro de que deseas eliminar esta tarea?',
       message: 'Esta acción no se puede deshacer.',
@@ -138,16 +138,16 @@ export class TaskListPage {
           text: 'Cancelar',
           role: 'cancel',
           handler: () => {
-            slidingItem.close();
+            event.slidingItem.close();
           }
         },
         {
           text: 'Eliminar',
           role: 'destructive',
           handler: () => {
-            this.taskService.deleteTask(taskId);
+            this.taskService.deleteTask(event.id);
             
-            slidingItem.close();
+            event.slidingItem.close();
           }
         }
 
@@ -155,30 +155,6 @@ export class TaskListPage {
     });
 
     await alert.present();
-  }
-
-  // color de cada una de las prioridades
-  public getPriorityColor(priority: string): string {
-    const colors: Record<string, string> = {
-      'alta': 'danger',
-      'media': 'warning',
-      'baja': 'success'
-    };
-    
-    return colors[priority] || 'primary';
-  }
-
-  // color de cada una de las prioridades
-  public getCategoryColor(category: string): string {
-    const colors: Record<string, string> = {
-      'compra': '#ffb703',
-      'casa': '#2c9e90',
-      'trabajo': '#0278b7',
-      'ocio': '#e76f51',
-      'otros': '#8d99ae'
-    };
-    
-    return colors[category] || '#cccccc';
   }
 
 }

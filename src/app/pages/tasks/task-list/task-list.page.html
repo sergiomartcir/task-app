@@ -13,66 +13,17 @@
   
   @if (showFilters()) {
     <ion-toolbar>
-      <section class="filters-section">
-        
-        <!--Sección con los filtros de tareas-->
-        <fieldset class="filters-grid">
-          <legend class="sr-only">Opciones de filtrado</legend>
-          
-          <!--Filtro de Estado-->
-          <label class="filter-col">
-            <span class="filter-text">Estado</span>
-            <ion-select interface="popover" [value]="statusFilter()" (ionChange)="changeStatusFilter($event)" aria-label="Estado">
-              <ion-select-option value="todas">Todas</ion-select-option>
-              <ion-select-option value="pendientes">Pendientes</ion-select-option>
-              <ion-select-option value="completadas">Completadas</ion-select-option>
-            </ion-select>
-          </label>
-
-          <!--Filtro de Proridad-->
-          <label class="filter-col">
-            <span class="filter-text">Prioridad</span>
-            <ion-select interface="popover" [value]="priorityFilter()" (ionChange)="changePriorityFilter($event)" aria-label="Prioridad">
-              <ion-select-option value="ninguno">Todas</ion-select-option>
-              <ion-select-option value="alta">Alta</ion-select-option>
-              <ion-select-option value="media">Media</ion-select-option>
-              <ion-select-option value="baja">Baja</ion-select-option>
-            </ion-select>
-          </label>
-
-          <!--Filtro de Categoría-->
-          <label class="filter-col">
-            <span class="filter-text">Categoría</span>
-            <ion-select interface="popover" [value]="categoryFilter()" (ionChange)="changeCategoryFilter($event)" aria-label="Categoría">
-              <ion-select-option value="todas">Todas</ion-select-option>
-              <ion-select-option value="compra">Compra</ion-select-option>
-              <ion-select-option value="casa">Casa</ion-select-option>
-              <ion-select-option value="trabajo">Trabajo</ion-select-option>
-              <ion-select-option value="ocio">Ocio</ion-select-option>
-              <ion-select-option value="otros">Otros</ion-select-option>
-            </ion-select>
-          </label>
-
-          <!--Filtro por Fecha límite-->
-          <label class="filter-col">
-            <span class="filter-text">Fecha</span>
-            <ion-select interface="popover" [value]="dateSort()" (ionChange)="changeDateSort($event)" aria-label="Fecha">
-              <ion-select-option value="ninguno">Por defecto</ion-select-option>
-              <ion-select-option value="desc">Mayor a menor</ion-select-option>
-              <ion-select-option value="asc">Menor a mayor</ion-select-option>
-            </ion-select>
-          </label>
-        </fieldset>
-
-      <!--Botón para restablecer los filtros-->
-        <footer class="filter-actions">
-          <ion-button fill="clear" size="small" color="medium" (click)="clearFilters()">
-            <ion-icon slot="start" name="refresh-outline"></ion-icon>
-            Limpiar filtros
-          </ion-button>
-        </footer>
-
-      </section>
+      <app-task-filters
+        [status]="statusFilter()"
+        [priority]="priorityFilter()"
+        [category]="categoryFilter()"
+        [sort]="dateSort()"
+        (statusChange)="changeStatusFilter($event)"
+        (priorityChange)="changePriorityFilter($event)"
+        (categoryChange)="changeCategoryFilter($event)"
+        (sortChange)="changeDateSort($event)"
+        (clear)="clearFilters()">
+      </app-task-filters>
     </ion-toolbar>
   }
 </ion-header>
@@ -84,41 +35,12 @@
         
         <!--cada una de las tasks que hayan en el array-->
         @for (task of filteredTasks(); track task.id) {
-          <ion-item-sliding #slidingItem class="custom-sliding">
-            <ion-item class="task-card-item" lines="none" (click)="navigateToTaskDetail(task.id)">
-              <article class="task-card-content" [class.is-completed]="task.completed">
-                
-                <header class="task-header">
-                  <hgroup class="title-and-category">
-                    <h3>{{ task.title }}</h3>
-                    <span class="category-oval" [ngStyle]="{'background-color': getCategoryColor(task.category)}">
-                      {{ task.category }}
-                    </span>
-                  </hgroup>
-                  <ion-badge [color]="getPriorityColor(task.priority)">
-                    {{ task.priority }}
-                  </ion-badge>
-                </header>
-
-                <footer class="task-footer">
-                  <small>Límite: {{ task.deadline | date:'dd/MM/yyyy' }}</small>
-                </footer>
-
-              </article>
-            </ion-item>
-            
-            <ion-item-options side="end">
-              
-              <ion-item-option (click)="toggleTaskCompletion(task.id, slidingItem)" [color]="task.completed ? 'medium' : 'success'">
-                <ion-icon slot="icon-only" [name]="task.completed ? 'close-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
-              </ion-item-option>
-              
-              <ion-item-option color="danger" (click)="confirmDeleteTask(task.id, slidingItem)">
-                <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-              </ion-item-option>
-
-            </ion-item-options>
-          </ion-item-sliding>
+          <app-task-card 
+            [task]="task"
+            (taskClick)="navigateToTaskDetail($event)"
+            (toggleComplete)="toggleTaskCompletion($event)"
+            (delete)="confirmDeleteTask($event)">
+          </app-task-card>
         <!--Si no hay ninguna sale este mensaje-->
         } @empty {
           <section class="empty-state">

@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+/* ESTILOS DE FILTROS DE LOS FILTROS*/
+.filters-section {
+  padding: 0.2rem 1rem 0.2rem 1rem;
+}
+
+/* Reducimos huecos y le quitamos los estilos por defecto a fieldset */
+.filters-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem; 
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.filter-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem; 
+  margin: 0;
+}
+
+/* El pie de la sección con el botón de limpiar */
+.filter-actions {
+  display: flex;
+  justify-content: flex-end; 
+  margin-top: 0.2rem;
+
+  ion-button {
+    margin: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: none; 
+  }
+}
+
+/* Ocultamos visualmente el legend (necesario por accesibilidad en fieldset) */
+.sr-only {
+  position: absolute; 
+  width: 1px; 
+  height: 1px; 
+  padding: 0; 
+  margin: -1px; 
+  overflow: hidden; 
+  clip: rect(0, 0, 0, 0); 
+  border: 0;
+}
+
+ion-select {
+  width: 100%; 
+  min-height: 32px;
+  font-size: 0.75rem; 
+  font-weight: 500;
+  background-color: #f4f5f8; 
+  border-radius: 8px;
+  padding: 0 0.4rem;
+  color: var(--ion-color-dark);
+  
+  &::part(icon) {
+    width: 12px;
+    opacity: 0.6;
+  }
+}

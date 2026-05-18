@@ -89,30 +89,10 @@
       </fieldset>
 
       <!--Sección de cámara/galería-->
-      <fieldset class="form-group camera-section">
-        <legend class="sr-only">Adjuntos de la tarea</legend>
-        <span class="field-label">Imagen adjunta (opcional)</span>
-
-        <!-- Si hay imagen, la mostramos dentro de un figure semántico -->
-        @if (capturedImage()) {
-          <figure class="image-preview">
-            <img [src]="capturedImage()" alt="Foto adjunta a la tarea" />
-            <figcaption class="sr-only">Vista previa de la imagen capturada</figcaption>
-            
-            <ion-button class="remove-img-btn" (click)="removePicture()" aria-label="Eliminar imagen">
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-            </ion-button>
-          </figure>
-        } @else {
-          <!--si no hay imagen, mostramos el botón para abrir la cámara-->
-          <article class="camera-placeholder">
-            <ion-button fill="outline" color="medium" expand="block" (click)="takePicture()">
-              <ion-icon slot="start" name="camera-outline"></ion-icon>
-              Añadir Foto
-            </ion-button>
-          </article>
-        }
-      </fieldset>
+      <app-task-camera 
+        [image]="capturedImage()" 
+        (imageChange)="updateCapturedImage($event)">
+      </app-task-camera>
 
       <!--El botón de guardar los cambios o crear la tarea (dependiendo del estado)-->
       <footer class="form-actions">
