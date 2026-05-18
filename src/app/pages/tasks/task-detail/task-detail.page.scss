@@ -75,3 +75,123 @@ ion-content {
 }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+
+/* --- SECCIÓN DE CÁMARA --- */
+.camera-section {
+  margin-top: 1rem; 
+  gap: 0.4rem !important; 
+
+  .field-label {
+    margin-bottom: 0 !important;
+  }
+}
+
+.camera-placeholder {
+  margin-top: 0;
+
+  ion-button {
+    --border-radius: 12px;
+    --border-style: dashed;
+    --border-width: 2px;
+    height: 60px;
+    margin: 0;
+  }
+}
+
+.image-preview {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 200px; 
+    object-fit: cover; 
+  }
+
+  .remove-img-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    margin: 0;
+    
+    /* Configuración del botón redondo blanco */
+    --background: #ffffff; 
+    --background-hover: #f4f5f8;
+    --border-radius: 50%;
+    
+    /* Para que sea un círculo perfecto */
+    width: 40px; 
+    height: 40px;
+    --padding-start: 0;
+    --padding-end: 0;
+    
+    --box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+
+    ion-icon {
+      color: var(--ion-color-danger); 
+      font-size: 1.4rem;
+    }
+  }
+}
+
+/* --- SECCIÓN DESCRIPCIÓN CON QR --- */
+.label-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+
+  .scan-qr-btn {
+    margin: 0;
+    height: 24px;
+    width: 32px;
+    --padding-start: 0;
+    --padding-end: 0;
+    --border-radius: 6px;
+    
+    ion-icon {
+      font-size: 1.3rem;
+      color: var(--ion-color-dark); /* Color principal para que destaque */
+    }
+  }
+}
+
+/*  
+  Cuando el escáner se activa, inyectamos esta clase en el body.
+  Necesitamos ocultar el fondo de ion-content para ver la cámara nativa debajo.
+*/
+:host-context(body.qrscanner-active) {
+  ion-content {
+    --background: transparent !important;
+  }
+  .form-container {
+    opacity: 0.1; /* Bajamos la opacidad del formulario para que el QR sea el protagonista */
+  }
+}
+
+/* --- ENLACES DETECTADOS --- */
+.detected-links-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Alineados a la derecha */
+  margin-top: 0.2rem;
+  gap: 0.2rem;
+
+  .link-btn {
+    margin: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: none; /* Para que no salga todo en mayúsculas */
+    letter-spacing: 0.5px;
+    /* Forzamos el color primario de Ionic para que parezca un enlace real */
+    color: var(--ion-color-primary); 
+  }
+}

@@ -29,10 +29,28 @@
 
         <!--apartado descripción (no es necesaria)-->
         <article class="field-wrapper">
-          <span class="field-label">Descripción (opcional)</span>
+          <header class="label-with-action">
+            <span class="field-label" style="margin-bottom: 0;">Descripción (opcional)</span>
+            
+            <ion-button fill="clear" class="scan-qr-btn" (click)="scanQRCode()" aria-label="Escanear código QR">
+              <ion-icon slot="icon-only" name="qr-code-outline"></ion-icon>
+            </ion-button>
+          </header>
+          
           <ion-item lines="none" class="input-box">
-            <ion-textarea formControlName="description" rows="4" placeholder="Añade detalles..."></ion-textarea>
+            <ion-textarea formControlName="description" rows="4" placeholder="Añade detalles o escanea un QR..."></ion-textarea>
           </ion-item>
+
+          @if (detectedLinks.length > 0) {
+            <aside class="detected-links-container">
+              @for (link of detectedLinks; track link) {
+                <ion-button fill="clear" size="small" [href]="link" target="_blank" rel="noopener noreferrer" class="link-btn">
+                  <ion-icon slot="start" name="link-outline"></ion-icon>
+                  Abrir enlace
+                </ion-button>
+              }
+            </aside>
+          }
         </article>
 
         <!--Apartado fecha límite-->
@@ -55,6 +73,45 @@
           </ion-item>
         </article>
 
+        <!--las opciones de categoría que hay-->
+        <article class="field-wrapper">
+          <span class="field-label">Categoría</span>
+          <ion-item lines="none" class="input-box">
+            <ion-select formControlName="category" interface="popover" placeholder="Selecciona">
+              <ion-select-option value="compra">Compra</ion-select-option>
+              <ion-select-option value="casa">Casa</ion-select-option>
+              <ion-select-option value="trabajo">Trabajo</ion-select-option>
+              <ion-select-option value="ocio">Ocio</ion-select-option>
+              <ion-select-option value="otros">Otros</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </article>
+      </fieldset>
+
+      <!--Sección de cámara/galería-->
+      <fieldset class="form-group camera-section">
+        <legend class="sr-only">Adjuntos de la tarea</legend>
+        <span class="field-label">Imagen adjunta (opcional)</span>
+
+        <!-- Si hay imagen, la mostramos dentro de un figure semántico -->
+        @if (capturedImage()) {
+          <figure class="image-preview">
+            <img [src]="capturedImage()" alt="Foto adjunta a la tarea" />
+            <figcaption class="sr-only">Vista previa de la imagen capturada</figcaption>
+            
+            <ion-button class="remove-img-btn" (click)="removePicture()" aria-label="Eliminar imagen">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </figure>
+        } @else {
+          <!--si no hay imagen, mostramos el botón para abrir la cámara-->
+          <article class="camera-placeholder">
+            <ion-button fill="outline" color="medium" expand="block" (click)="takePicture()">
+              <ion-icon slot="start" name="camera-outline"></ion-icon>
+              Añadir Foto
+            </ion-button>
+          </article>
+        }
       </fieldset>
 
       <!--El botón de guardar los cambios o crear la tarea (dependiendo del estado)-->

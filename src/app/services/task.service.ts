@@ -21,33 +21,37 @@ export class TaskService {
     let initialTasks: Task[] = [
       {
         id: 1,
-        title: 'Tarea 1',
-        description: 'Hola',
+        title: 'Revisar repositorio',
         deadline: '2026-05-02',
         priority: 'alta',
+        category: 'trabajo',
         completed: true
       },
       {
         id: 2,
-        title: 'Tarea 2',
-        description: 'Revisar',
+        title: 'Hacer la compra',
+        description: 'Revisar la lista de la compra para el Mercadona',
         deadline: '2026-05-8',
-        priority: 'baja',
+        priority: 'media',
+        category: 'compra',
         completed: false
       },
       {
         id: 3,
-        title: 'Tarea 3',
-        description: 'Revisar la documentación oficial',
+        title: 'Cortar el césped',
+        description: 'Cortar el césped del jardín y quitar las malas hierbas',
         deadline: '2026-06-01',
-        priority: 'media',
+        priority: 'baja',
+        category: 'casa',
         completed: false
       },
       {
         id: 4,
-        title: 'Tarea 4',
+        title: 'Cine',
+        description: 'Comprar las entradas para la nueva película',
         deadline: '2026-04-06',
         priority: 'alta',
+        category: 'ocio',
         completed: true
       }
     ];
@@ -63,7 +67,7 @@ export class TaskService {
   
   // métodos CRUD
   public getTaskById(id: number): Task | undefined {
-    return this.tasksSignal().find(task => task.id === id);;
+    return this.tasksSignal().find(task => task.id === id);
   }
 
   public addTask(newTask: Task): void {

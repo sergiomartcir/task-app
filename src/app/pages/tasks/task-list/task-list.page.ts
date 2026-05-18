@@ -1,14 +1,15 @@
 import { Component, inject, signal, computed} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonList, IonItemSliding, IonItem, IonFab, IonFabButton, IonBadge, IonItemOptions, IonItemOption, AlertController, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonList, IonItemSliding, IonItem, IonFab, IonFabButton, IonBadge, IonItemOptions, IonItemOption, AlertController, IonSelect, IonSelectOption, IonButtons, IonButton } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { TaskService } from 'src/app/services/task.service';
 import { addIcons } from 'ionicons';
-import { addOutline, checkmarkCircleOutline, closeCircleOutline, trashOutline } from 'ionicons/icons';
+import { addOutline, checkmarkCircleOutline, closeCircleOutline, trashOutline, refreshOutline, filterOutline } from 'ionicons/icons';
 
 export type StatusFilter = 'todas' | 'pendientes' | 'completadas';
 export type PriorityFilter = 'ninguno' | 'alta' | 'media' | 'baja';
+export type CategoryFilter = 'todas' | 'compra' | 'casa' | 'trabajo' | 'ocio' | 'otros';
 export type DateSort = 'ninguno' | 'asc' | 'desc';
 
 @Component({
@@ -16,7 +17,7 @@ export type DateSort = 'ninguno' | 'asc' | 'desc';
   templateUrl: './task-list.page.html',
   styleUrls: ['./task-list.page.scss'],
   standalone: true,
-  imports: [ IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonIcon, IonList, IonItemSliding, IonItem, IonFab, IonFabButton, IonBadge, IonItemOptions, IonItemOption, IonSelect, IonSelectOption]
+  imports: [ IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonIcon, IonList, IonItemSliding, IonItem, IonFab, IonFabButton, IonBadge, IonItemOptions, IonItemOption, IonSelect, IonSelectOption, IonButtons, IonButton]
 })
 export class TaskListPage {
 
@@ -27,16 +28,19 @@ export class TaskListPage {
   // la señal del service con la lista de tareas
   private allTasks = this.taskService.tasks;
 
-  // las tres señales para cada uno de los desplegables de ls filtros
+  // las señales para cada uno de los desplegables de ls filtros
   public statusFilter = signal<StatusFilter>('todas');
   public priorityFilter = signal<PriorityFilter>('ninguno');
+  public categoryFilter = signal<CategoryFilter>('todas');
   public dateSort = signal<DateSort>('ninguno');
+  public showFilters = signal<boolean>(false);
 
   //señal computada que evalúa los tres filtros
   public filteredTasks = computed(() => {
     const tasks = this.allTasks();
     const status = this.statusFilter();
     const priority = this.priorityFilter();
+    const category = this.categoryFilter();
     const sort = this.dateSort();
 
     // Filtrado en una sola pasada
@@ -46,8 +50,9 @@ export class TaskListPage {
         || (status === 'completadas' && task.completed);
         
       const matchPriority = priority === 'ninguno' || task.priority === priority;
+      const matchCategory = category === 'todas' || task.category === category;
 
-      return matchStatus && matchPriority;
+      return matchStatus && matchPriority && matchCategory;
     });
 
     // Ordenación
@@ -68,7 +73,9 @@ export class TaskListPage {
       addOutline,
       trashOutline,
       checkmarkCircleOutline, 
-      closeCircleOutline
+      closeCircleOutline,
+      refreshOutline,
+      filterOutline
     });
   }
 
@@ -81,8 +88,24 @@ export class TaskListPage {
     this.priorityFilter.set(event.detail.value as PriorityFilter);
   }
 
+  public changeCategoryFilter(event: CustomEvent): void {
+    this.categoryFilter.set(event.detail.value as CategoryFilter);
+  }
+
   public changeDateSort(event: CustomEvent): void {
     this.dateSort.set(event.detail.value as DateSort);
+  }
+
+  public clearFilters(): void {
+    this.statusFilter.set('todas');
+    this.priorityFilter.set('ninguno');
+    this.categoryFilter.set('todas');
+    this.dateSort.set('ninguno');
+  }
+
+  // método para desplegar/ocultar el apartado de filtros
+  public toggleFilters(): void {
+    this.showFilters.update(v => !v);
   }
 
   // --- MÉTODOS DE NAVEGACIÓN Y ACCIONES ---
@@ -143,6 +166,19 @@ export class TaskListPage {
     };
     
     return colors[priority] || 'primary';
+  }
+
+  // color de cada una de las prioridades
+  public getCategoryColor(category: string): string {
+    const colors: Record<string, string> = {
+      'compra': '#ffb703',
+      'casa': '#2c9e90',
+      'trabajo': '#0278b7',
+      'ocio': '#e76f51',
+      'otros': '#8d99ae'
+    };
+    
+    return colors[category] || '#cccccc';
   }
 
 }

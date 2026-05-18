@@ -1,58 +1,100 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>Tareas</ion-title>
+
+    <!--Botón de filtros que despliega todas las opciones-->
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleFilters()" [color]="showFilters() ? 'primary' : 'medium'">
+        <ion-icon slot="start" name="filter-outline"></ion-icon>
+        Filtros
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
   
-  <ion-toolbar>
-    <!-- Filtros de la lista de tareas-->
-    <section class="filters-row">
-      <!--Filtro Estado-->
-      <label class="filter-col">
-        <span class="filter-text">Estado</span>
-        <ion-select interface="popover" [value]="statusFilter()" (ionChange)="changeStatusFilter($event)" aria-label="Estado">
-          <ion-select-option value="todas">Todas</ion-select-option>
-          <ion-select-option value="pendientes">Pendientes</ion-select-option>
-          <ion-select-option value="completadas">Completadas</ion-select-option>
-        </ion-select>
-      </label>
+  @if (showFilters()) {
+    <ion-toolbar>
+      <section class="filters-section">
+        
+        <!--Sección con los filtros de tareas-->
+        <fieldset class="filters-grid">
+          <legend class="sr-only">Opciones de filtrado</legend>
+          
+          <!--Filtro de Estado-->
+          <label class="filter-col">
+            <span class="filter-text">Estado</span>
+            <ion-select interface="popover" [value]="statusFilter()" (ionChange)="changeStatusFilter($event)" aria-label="Estado">
+              <ion-select-option value="todas">Todas</ion-select-option>
+              <ion-select-option value="pendientes">Pendientes</ion-select-option>
+              <ion-select-option value="completadas">Completadas</ion-select-option>
+            </ion-select>
+          </label>
 
-      <!--Filtro Prioridad-->
-      <label class="filter-col">
-        <span class="filter-text">Prioridad</span>
-        <ion-select interface="popover" [value]="priorityFilter()" (ionChange)="changePriorityFilter($event)" aria-label="Prioridad">
-          <ion-select-option value="ninguno">Todas</ion-select-option>
-          <ion-select-option value="alta">Alta</ion-select-option>
-          <ion-select-option value="media">Media</ion-select-option>
-          <ion-select-option value="baja">Baja</ion-select-option>
-        </ion-select>
-      </label>
+          <!--Filtro de Proridad-->
+          <label class="filter-col">
+            <span class="filter-text">Prioridad</span>
+            <ion-select interface="popover" [value]="priorityFilter()" (ionChange)="changePriorityFilter($event)" aria-label="Prioridad">
+              <ion-select-option value="ninguno">Todas</ion-select-option>
+              <ion-select-option value="alta">Alta</ion-select-option>
+              <ion-select-option value="media">Media</ion-select-option>
+              <ion-select-option value="baja">Baja</ion-select-option>
+            </ion-select>
+          </label>
 
-      <!--filtro Fecha-->
-      <label class="filter-col">
-        <span class="filter-text">Fecha</span>
-        <ion-select interface="popover" [value]="dateSort()" (ionChange)="changeDateSort($event)" aria-label="Fecha">
-          <ion-select-option value="ninguno">Por defecto</ion-select-option>
-          <ion-select-option value="desc">Mayor a menor</ion-select-option>
-          <ion-select-option value="asc">Menor a mayor</ion-select-option>
-        </ion-select>
-      </label>
+          <!--Filtro de Categoría-->
+          <label class="filter-col">
+            <span class="filter-text">Categoría</span>
+            <ion-select interface="popover" [value]="categoryFilter()" (ionChange)="changeCategoryFilter($event)" aria-label="Categoría">
+              <ion-select-option value="todas">Todas</ion-select-option>
+              <ion-select-option value="compra">Compra</ion-select-option>
+              <ion-select-option value="casa">Casa</ion-select-option>
+              <ion-select-option value="trabajo">Trabajo</ion-select-option>
+              <ion-select-option value="ocio">Ocio</ion-select-option>
+              <ion-select-option value="otros">Otros</ion-select-option>
+            </ion-select>
+          </label>
 
-    </section>
-  </ion-toolbar>
+          <!--Filtro por Fecha límite-->
+          <label class="filter-col">
+            <span class="filter-text">Fecha</span>
+            <ion-select interface="popover" [value]="dateSort()" (ionChange)="changeDateSort($event)" aria-label="Fecha">
+              <ion-select-option value="ninguno">Por defecto</ion-select-option>
+              <ion-select-option value="desc">Mayor a menor</ion-select-option>
+              <ion-select-option value="asc">Menor a mayor</ion-select-option>
+            </ion-select>
+          </label>
+        </fieldset>
+
+      <!--Botón para restablecer los filtros-->
+        <footer class="filter-actions">
+          <ion-button fill="clear" size="small" color="medium" (click)="clearFilters()">
+            <ion-icon slot="start" name="refresh-outline"></ion-icon>
+            Limpiar filtros
+          </ion-button>
+        </footer>
+
+      </section>
+    </ion-toolbar>
+  }
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <main class="list-container">
     <section class="tasks-section">
       <ion-list lines="none">
+        
         <!--cada una de las tasks que hayan en el array-->
         @for (task of filteredTasks(); track task.id) {
           <ion-item-sliding #slidingItem class="custom-sliding">
             <ion-item class="task-card-item" lines="none" (click)="navigateToTaskDetail(task.id)">
-              <div class="task-card-content" [class.is-completed]="task.completed">
+              <article class="task-card-content" [class.is-completed]="task.completed">
                 
                 <header class="task-header">
-                  <h3>{{ task.title }}</h3>
+                  <hgroup class="title-and-category">
+                    <h3>{{ task.title }}</h3>
+                    <span class="category-oval" [ngStyle]="{'background-color': getCategoryColor(task.category)}">
+                      {{ task.category }}
+                    </span>
+                  </hgroup>
                   <ion-badge [color]="getPriorityColor(task.priority)">
                     {{ task.priority }}
                   </ion-badge>
@@ -62,8 +104,9 @@
                   <small>Límite: {{ task.deadline | date:'dd/MM/yyyy' }}</small>
                 </footer>
 
-              </div>
+              </article>
             </ion-item>
+            
             <ion-item-options side="end">
               
               <ion-item-option (click)="toggleTaskCompletion(task.id, slidingItem)" [color]="task.completed ? 'medium' : 'success'">
