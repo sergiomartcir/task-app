@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { TaskService } from 'src/app/services/task.service';
+import { QrScannerService } from 'src/app/services/qr-scanner.service';
 import { Task, TaskCategory, TaskPriority } from 'src/app/interfaces/task.interface';
 import { TaskCameraComponent } from 'src/app/shared/components/task-camera/task-camera.component';
 import { addIcons } from 'ionicons';
@@ -22,6 +22,7 @@ export class TaskDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private taskService = inject(TaskService);
+  private qrScannerService = inject(QrScannerService);
   
   // Señal para saber si la vista está en modo edición o creación
   public isEditMode = signal<boolean>(false);
@@ -131,44 +132,21 @@ export class TaskDetailPage implements OnInit {
     this.capturedImage.set(newImage);
   }
 
-  // --- MÉTODOS PARA EL ESCÁNER QR ---
+  // -- FUNCIONALIDAD DE ESCÁNER QR -- 
 
   public async scanQRCode(): Promise<void> {
-    try {
-      // 1. Pedimos permiso para usar la cámara
-      const status = await BarcodeScanner.checkPermission({ force: true });
+    // llamamos a nuestro servicio limpio
+    const qrText = await this.qrScannerService.scanQRCode();
 
-      if (status.granted) {
-        // 2. Ocultamos el fondo de la app para que se vea la cámara por debajo
-        document.body.classList.add('qrscanner-active');
-        await BarcodeScanner.hideBackground();
-
-        // 3. Iniciamos el escaneo
-        const result = await BarcodeScanner.startScan();
-
-        // 4. Detenemos la cámara y restauramos el fondo
-        await BarcodeScanner.showBackground();
-        await BarcodeScanner.stopScan();
-        document.body.classList.remove('qrscanner-active');
-
-        // 5. Si ha leído algo, lo inyectamos en el campo descripción
-        if (result.hasContent && result.content) {
-          this.taskForm.patchValue({
-            // Si ya había texto, le sumamos el QR. Si no, solo el QR.
-            description: this.taskForm.value.description 
-              ? `${this.taskForm.value.description}\n${result.content}`
-              : result.content
-          });
-        }
-      } else {
-        console.warn('Permiso de cámara denegado para el escáner QR');
-      }
-    } catch (error) {
-      console.error('Error al usar el escáner QR', error);
-      // Por si hay un error, nos aseguramos de no dejar la pantalla transparente
-      BarcodeScanner.showBackground();
-      BarcodeScanner.stopScan();
-      document.body.classList.remove('qrscanner-active');
+    // Si nos ha devuelto algo, actualizamos el formulario
+    if (qrText) {
+      const currentDescription = this.taskForm.value.description;
+      
+      this.taskForm.patchValue({
+        description: currentDescription 
+          ? `${currentDescription}\n${qrText}`
+          : qrText
+      });
     }
   }
 
