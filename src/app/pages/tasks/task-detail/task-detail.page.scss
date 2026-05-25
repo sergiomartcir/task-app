@@ -98,19 +98,6 @@ ion-content {
   }
 }
 
-/*  
-  Cuando el escáner se activa, inyectamos esta clase en el body.
-  Necesitamos ocultar el fondo de ion-content para ver la cámara nativa debajo.
-*/
-:host-context(body.qrscanner-active) {
-  ion-content {
-    --background: transparent !important;
-  }
-  .form-container {
-    opacity: 0.1; /* Bajamos la opacidad del formulario para que el QR sea el protagonista */
-  }
-}
-
 /* --- ENLACES DETECTADOS --- */
 .detected-links-container {
   display: flex;

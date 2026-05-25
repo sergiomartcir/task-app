@@ -88,6 +88,15 @@
         </article>
       </fieldset>
 
+      <!--Sección del mapa-->
+      <app-task-map
+        [savedLocation]="selectedLocation()"
+        [isVisible]="isMapVisible()"
+        (locationSelect)="onLocationSelected($event)"
+        (toggleVisibility)="toggleMap()"
+        (clearLocation)="clearLocation()">
+      </app-task-map>
+
       <!--Sección de cámara/galería-->
       <app-task-camera 
         [image]="capturedImage()" 

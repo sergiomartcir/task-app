@@ -1,12 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TaskService } from 'src/app/services/task.service';
 import { QrScannerService } from 'src/app/services/qr-scanner.service';
 import { Task, TaskCategory, TaskPriority } from 'src/app/interfaces/task.interface';
+import { TaskLocation } from 'src/app/interfaces/task-location.interface';
 import { TaskCameraComponent } from 'src/app/shared/components/task-camera/task-camera.component';
+import { TaskMapComponent } from 'src/app/shared/components/task-map/task-map.component';
 import { addIcons } from 'ionicons';
 import { saveOutline, qrCodeOutline, linkOutline } from 'ionicons/icons';
 
@@ -15,7 +17,7 @@ import { saveOutline, qrCodeOutline, linkOutline } from 'ionicons/icons';
   templateUrl: './task-detail.page.html',
   styleUrls: ['./task-detail.page.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon, TaskCameraComponent]
+  imports: [CommonModule, ReactiveFormsModule, IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonBackButton, IonItem, IonInput, IonTextarea, IonSelect, IonSelectOption, IonButton, IonIcon, TaskCameraComponent, TaskMapComponent]
 })
 export class TaskDetailPage implements OnInit {
   private fb = inject(FormBuilder);
@@ -28,7 +30,9 @@ export class TaskDetailPage implements OnInit {
   public isEditMode = signal<boolean>(false);
   // señal para la imagen capturada con el dispositivo
   public capturedImage = signal<string | undefined>(undefined);
-  
+  public selectedLocation = signal<TaskLocation | undefined>(undefined);
+  public isMapVisible = signal<boolean>(false);
+
   // Guardamos el ID actual si estamos editando
   private currentTaskId: number | null = null;
   // guardamos el estado original de la tarea para no perderlo al editar
@@ -47,7 +51,7 @@ export class TaskDetailPage implements OnInit {
     addIcons({ 
       saveOutline,
       qrCodeOutline,
-      linkOutline
+      linkOutline,
     });
   }
 
@@ -73,6 +77,7 @@ export class TaskDetailPage implements OnInit {
       // Guardamos el estado completado para no sobreescribirlo accidentalmente
       this.isTaskCompleted = task.completed;
       this.capturedImage.set(task.image);  //Guardamos la image
+      this.selectedLocation.set(task.location);
       
       // rellenamos el formulario con los datos existentes
       this.taskForm.patchValue({
@@ -99,6 +104,7 @@ export class TaskDetailPage implements OnInit {
         priority: formValues.priority,
         category: formValues.category,
         image: this.capturedImage(),
+        location: this.selectedLocation(),
         completed: this.isTaskCompleted 
       };
 
@@ -158,6 +164,22 @@ export class TaskDetailPage implements OnInit {
     
     // Devuelve un array con todos los enlaces encontrados, o un array vacío si no hay ninguno
     return text.match(urlRegex) || [];
+  }
+
+  // -- FUNCIONALIDAD DEL MAPA --
+
+  public toggleMap(): void {
+    this.isMapVisible.update(v => !v);
+  }
+
+  public onLocationSelected(location: TaskLocation): void {
+    this.selectedLocation.set(location);
+    this.isMapVisible.set(false); // Ocultamos el mapa al seleccionar para limpiar la vista
+  }
+
+  public clearLocation(): void {
+    this.selectedLocation.set(undefined);
+    this.isMapVisible.set(true); // Opcional: Reabrimos el mapa por si quiere elegir otra
   }
 
 }

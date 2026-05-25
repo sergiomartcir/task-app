@@ -1,0 +1,41 @@
+<fieldset class="form-group location-section">
+  <legend class="sr-only">Ubicación de la tarea</legend>
+  <span class="field-label">Ubicación (Opcional)</span>
+
+  @if (savedLocation) {
+    <article class="location-preview">
+      <section class="location-info">
+        <ion-icon name="location-outline" color="primary" aria-hidden="true"></ion-icon>
+        <hgroup class="location-text">
+          <h4>{{ savedLocation.name }}</h4>
+          <p>Ubicación asignada</p>
+        </hgroup>
+      </section>
+      
+      <ion-button fill="clear" color="danger" (click)="onClearClicked()" aria-label="Borrar ubicación">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </article>
+  } @else {
+    <article class="map-placeholder">
+      <ion-button fill="outline" color="medium" expand="block" (click)="toggleVisibility.emit()">
+        <ion-icon slot="start" name="map-outline"></ion-icon>
+        {{ isVisible ? 'Ocultar Mapa' : 'Asignar Ubicación' }}
+      </ion-button>
+    </article>
+  }
+
+  <section class="map-wrapper" [class.map-hidden]="!isVisible && !savedLocation">
+    <header class="map-header">
+      <small class="helper-text">
+        Mantén pulsado en el mapa (o clic derecho en PC) para colocar o mover el destino.
+      </small>
+    </header>
+    
+    <section 
+      id="task-map-canvas" 
+      class="map-canvas" 
+      aria-label="Mapa interactivo para seleccionar ubicación">
+    </section>
+  </section>
+</fieldset>

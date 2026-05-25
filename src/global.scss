@@ -35,3 +35,12 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Estilos globales de Leaflet para la correcta renderización de los mapas */
+@import 'leaflet/dist/leaflet.css';
+
+/* Estilos globales para el buscador (Geocoder) del mapa */
+@import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
+
+/* Estilos globales para el trazado de rutas en el mapa */
+@import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
