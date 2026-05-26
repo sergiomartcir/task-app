@@ -10,27 +10,7 @@ import { GeolocationService } from 'src/app/services/geolocation.service';
 import { addIcons } from 'ionicons';
 import { mapOutline, locationOutline, trashOutline } from 'ionicons/icons';
 
-// Círculo ubicación usuario
-const USER_MARKER_STYLE: L.CircleMarkerOptions = {
-  radius: 8,
-  fillColor: '#007bff',
-  color: '#ffffff',
-  weight: 2,
-  opacity: 1,
-  fillOpacity: 0.8
-};
-
-// icono chincheta en SVG (para que no falle la ruta ni pierda calidad)
-const DESTINATION_PIN_ICON = L.divIcon({
-  className: 'custom-pin-wrapper',
-  // SVG de un pin típico de mapa en rojo oscuro
-  html: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#a00430" width="36px" height="36px">
-          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-         </svg>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 36], // Anclamos la punta exacta del pin al centro de la coordenada
-  popupAnchor: [0, -36] // Hacemos que el mensajito salga justo por encima del pin
-});
+import { DEFAULT_MAP_COORDS, USER_MARKER_STYLE, DESTINATION_PIN_ICON } from '../../config/map.constants';
 
 @Component({
   selector: 'app-task-map',
@@ -73,14 +53,19 @@ export class TaskMapComponent implements AfterViewInit, OnChanges {
     const coords = await this.geolocationService.getCurrentLocation();
 
     // Si no conseguimos ubicación (ej: sin permisos en PC), ponemos Madrid por defecto para que no se bloquee.
-    const finalCoords = coords || { latitude: 40.4168, longitude: -3.7038 };
+    const finalCoords = coords || DEFAULT_MAP_COORDS;
 
     this.userCoords.set(finalCoords);
     this.initializeMap(finalCoords);
   }
 
-  // Detecta cuando el mapa pasa de pculto a visible
   ngOnChanges(changes: SimpleChanges): void {
+    this.handleMapResize(changes);
+    this.handleLocationRemoval(changes);
+  }
+
+  // Se encarga de redimensionar el tamaño del mapa
+  private handleMapResize(changes: SimpleChanges): void {
     const visibilityChanged = changes['isVisible'] && this.isVisible;
     const locationLoaded = changes['savedLocation'] && this.savedLocation;
 
@@ -90,8 +75,12 @@ export class TaskMapComponent implements AfterViewInit, OnChanges {
         this.map.invalidateSize();
       }, 100);
     }
+  }
 
-    // si se elimina la ubicación. se elimina la "chincheta" del mapa y su ruta óptima
+
+  // Elimina la ubicación que haya en el mapa
+  private handleLocationRemoval(changes: SimpleChanges): void {
+    // si se elimina la ubicación, se elimina la "chincheta" del mapa y su ruta óptima
     if (changes['savedLocation'] && !changes['savedLocation'].currentValue) {
       if (this.customMarker) {
         this.customMarker.remove(); // Borramos el dibujo de la chincheta del lienzo de Leaflet
@@ -126,23 +115,7 @@ export class TaskMapComponent implements AfterViewInit, OnChanges {
       .addTo(this.map)
       .bindPopup('<b>Tu ubicación actual</b>');
     
-    // Inicializamos el buscador del mapa del plugin
-    const geocoder = new Geocoder({
-      geocoder: new geocoders.Nominatim(),
-      position: 'topright', // Lo ponemos a la derecha para que no pise el zoom
-      defaultMarkGeocode: false, // Evitamos que ponga su chincheta predeterminada
-      placeholder: 'Buscar lugar o dirección...'
-    }).addTo(this.map);
-
-    // Escuchamos cuando el buscador encuentra un resultado
-    geocoder.on('markgeocode', (e: any) => {
-      const center = e.geocode.center; // Coordenadas del resultado
-      // Limpiamos un poco el nombre para que no sea larguísimo
-      const placeName = e.geocode.name.split(',')[0]; 
-
-      // Usamos nuestra función unificada para colocar nuestra chincheta roja
-      this.placeCustomMarker(center, placeName);
-    });
+    this.setupGeocoder();
 
     // Evento de clic derecho / mantener pulsado
     this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
@@ -160,6 +133,26 @@ export class TaskMapComponent implements AfterViewInit, OnChanges {
 
       this.drawRoute(L.latLng(this.savedLocation.latitude, this.savedLocation.longitude));
     }
+  }
+
+  private setupGeocoder(): void {
+    // Inicializamos el buscador del mapa del plugin
+    const geocoder = new Geocoder({
+      geocoder: new geocoders.Nominatim(),
+      position: 'topright', // Lo ponemos a la derecha para que no pise el zoom
+      defaultMarkGeocode: false, // Evitamos que ponga su chincheta predeterminada
+      placeholder: 'Buscar lugar o dirección...'
+    }).addTo(this.map);
+    
+    // Escuchamos cuando el buscador encuentra un resultado
+    geocoder.on('markgeocode', (e: any) => {
+      const center = e.geocode.center; // Coordenadas del resultado
+      // Limpiamos un poco el nombre para que no sea larguísimo
+      const placeName = e.geocode.name.split(',')[0]; 
+
+      // Usamos nuestra función unificada para colocar nuestra chincheta roja
+      this.placeCustomMarker(center, placeName);
+    });
   }
 
   // se ejecuta cuando el usuario mantiene pulsado en el mapa
